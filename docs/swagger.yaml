@@ -1,0 +1,60 @@
+basePath: /api/v1
+definitions:
+  presentation.GetGithuUsersRequest:
+    properties:
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  presentation.GetGithubUsersResponse:
+    properties:
+      message:
+        type: string
+      result:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: apolinario.torresjr@gmail.com
+    name: Pol Torres
+  description: A service that provides Github user details
+  title: GithubUser APIs
+  version: "1.0"
+paths:
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Get details of all provided github users
+      parameters:
+      - description: List of users
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/presentation.GetGithuUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+      summary: Get details of all provided github users
+      tags:
+      - user
+swagger: "2.0"
