@@ -12,6 +12,8 @@ import (
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
+const GinMode = gin.ReleaseMode
+
 // @title          GithubUser APIs
 // @version        1.0.0
 // @description    A service that provides Github user details
@@ -25,6 +27,8 @@ func main() {
 	githubUserController := presentation.New(githubServiceImpl)
 
 	router := gin.Default()
+	gin.SetMode(GinMode)
+
 	router.Use(middleware.AppendRequestID)
 
 	v1 := router.Group("/api/v1")

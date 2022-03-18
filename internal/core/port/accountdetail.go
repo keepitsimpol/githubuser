@@ -8,5 +8,5 @@ import (
 )
 
 type AccountDetailService interface {
-	GetAccountDetails(users model.GetAccountDetailRequest, ctx context.Context) (response []interface{}, appError errorcode.AppErrorCode, err error)
+	GetAccountDetails(users model.GetAccountDetailRequest, ctx context.Context) (response []model.GetAccountDetailResponse, appError errorcode.AppErrorCode, err error)
 }

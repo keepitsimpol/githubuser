@@ -22,7 +22,7 @@ func New(githubClient port.GithubClient) *githubAccountDetailService {
 }
 
 // GetAccountDetails Gets Github user details and returns apprioriate app error code and error message
-func (s githubAccountDetailService) GetAccountDetails(users model.GetAccountDetailRequest, ctx context.Context) (response []interface{}, appError errorcode.AppErrorCode, err error) {
+func (s githubAccountDetailService) GetAccountDetails(users model.GetAccountDetailRequest, ctx context.Context) (response []model.GetAccountDetailResponse, appError errorcode.AppErrorCode, err error) {
 	util.Infof(ctx, "Start getting github users service with request: %v", users)
 
 	err = validate.New().Struct(users)
@@ -34,7 +34,7 @@ func (s githubAccountDetailService) GetAccountDetails(users model.GetAccountDeta
 	for _, user := range users.UserNames {
 		if cachedUser, ok := util.GetCache().Get(user); ok {
 			util.Infof(ctx, "User: %s is already cached. Reusing cached entry.", user)
-			response = append(response, cachedUser)
+			response = append(response, cachedUser.(model.GetAccountDetailResponse))
 			continue
 		}
 
@@ -45,7 +45,13 @@ func (s githubAccountDetailService) GetAccountDetails(users model.GetAccountDeta
 		}
 
 		util.Infof(ctx, "Adding account details for user: %s", user)
-		response = append(response, githubClientResponse)
+		response = append(response, model.GetAccountDetailResponse{
+			Name:        githubClientResponse.Name,
+			Login:       githubClientResponse.Login,
+			Company:     githubClientResponse.Company,
+			Followers:   githubClientResponse.Followers,
+			PublicRepos: githubClientResponse.PublicRepos,
+		})
 		util.AddtoCache(user, githubClientResponse)
 	}
 

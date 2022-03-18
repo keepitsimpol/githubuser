@@ -12,7 +12,7 @@ const (
 	CacheNumCounters = 1000
 	CacheMaxCost     = 1 << 30
 	CacheBufferItems = 64
-	CacheExpiration  = 30 * time.Second
+	CacheExpiration  = 2 * time.Minute
 )
 
 func GetCache() *ristretto.Cache {

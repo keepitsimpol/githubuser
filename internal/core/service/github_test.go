@@ -92,7 +92,7 @@ func TestGetAccountDetails(t *testing.T) {
 				g.Expect(err).To(BeNil())
 
 				if !tc.hasClientError {
-					sampleResponse := response[0].(port.GetGithubUserResponse)
+					sampleResponse := response[0]
 					g.Expect(sampleResponse.Name).To(Equal(tc.response.Name))
 					g.Expect(sampleResponse.Login).To(Equal(tc.response.Login))
 					g.Expect(sampleResponse.Company).To(Equal(tc.response.Company))

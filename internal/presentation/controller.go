@@ -26,9 +26,17 @@ type GetAccountDetailsRequest struct {
 }
 
 type GetAccountDetailsResponse struct {
-	Result      bool   `json:"result"`
-	Message     string `json:"message"`
-	UserDetails []interface{}
+	Result      bool          `json:"result"`
+	Message     string        `json:"message"`
+	UserDetails []UserDetails `json:"userDetails"`
+}
+
+type UserDetails struct {
+	Name        string `json:"name"`
+	Login       string `json:"login"`
+	Company     string `json:"company"`
+	Followers   int    `json:"followers"`
+	PublicRepos int    `json:"publicRepos"`
 }
 
 // GetUserAccountDetails godoc
@@ -58,11 +66,12 @@ func (c accountDetailController) GetUserAccountDetails(ctx *gin.Context) {
 	httpCode := c.convertAppErrorCodeToHttpCode(errorType, ctx)
 	if err != nil {
 		ctx.JSON(httpCode, GetAccountDetailsResponse{Message: err.Error()})
+		return
 	}
 
 	ctx.JSON(httpCode, GetAccountDetailsResponse{
 		Result:      true,
-		UserDetails: response,
+		UserDetails: c.convertToUserDetails(response),
 	})
 	util.Infoln(ctx, "End Getting all github users detail")
 }
@@ -81,4 +90,17 @@ func (c accountDetailController) convertAppErrorCodeToHttpCode(errorType errorco
 		util.Errorf(ctx, "Unsupported error type: %d", errorType)
 		return http.StatusInternalServerError
 	}
+}
+
+func (c accountDetailController) convertToUserDetails(response []model.GetAccountDetailResponse) (userDetails []UserDetails) {
+	for _, accountDetail := range response {
+		userDetails = append(userDetails, UserDetails{
+			Name:        accountDetail.Name,
+			Login:       accountDetail.Login,
+			Company:     accountDetail.Company,
+			Followers:   accountDetail.Followers,
+			PublicRepos: accountDetail.PublicRepos,
+		})
+	}
+	return userDetails
 }
