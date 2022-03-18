@@ -19,7 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users": {
+        "/users/github": {
             "post": {
                 "description": "Get details of all provided github users",
                 "consumes": [
@@ -39,7 +39,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithuUsersRequest"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsRequest"
                         }
                     }
                 ],
@@ -47,25 +47,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     }
                 }
@@ -73,7 +73,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "presentation.GetGithuUsersRequest": {
+        "presentation.GetAccountDetailsRequest": {
             "type": "object",
             "properties": {
                 "users": {
@@ -84,7 +84,7 @@ const docTemplate = `{
                 }
             }
         },
-        "presentation.GetGithubUsersResponse": {
+        "presentation.GetAccountDetailsResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -92,6 +92,10 @@ const docTemplate = `{
                 },
                 "result": {
                     "type": "boolean"
+                },
+                "userDetails": {
+                    "type": "array",
+                    "items": {}
                 }
             }
         }
@@ -100,7 +104,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "1.0.0",
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

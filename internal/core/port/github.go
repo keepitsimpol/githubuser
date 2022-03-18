@@ -1,7 +1,9 @@
-package gateway
+package port
+
+import "context"
 
 type GithubClient interface {
-	GetGithubUser(user string) GetGithubUserResponse
+	GetGithubUser(user string, ctx context.Context) (GetGithubUserResponse, error)
 }
 
 type GetGithubUserResponse struct {

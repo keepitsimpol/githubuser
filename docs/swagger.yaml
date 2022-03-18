@@ -1,18 +1,21 @@
 basePath: /api/v1
 definitions:
-  presentation.GetGithuUsersRequest:
+  presentation.GetAccountDetailsRequest:
     properties:
       users:
         items:
           type: string
         type: array
     type: object
-  presentation.GetGithubUsersResponse:
+  presentation.GetAccountDetailsResponse:
     properties:
       message:
         type: string
       result:
         type: boolean
+      userDetails:
+        items: {}
+        type: array
     type: object
 host: localhost:8080
 info:
@@ -21,9 +24,9 @@ info:
     name: Pol Torres
   description: A service that provides Github user details
   title: GithubUser APIs
-  version: "1.0"
+  version: 1.0.0
 paths:
-  /users:
+  /users/github:
     post:
       consumes:
       - application/json
@@ -34,26 +37,26 @@ paths:
         name: account
         required: true
         schema:
-          $ref: '#/definitions/presentation.GetGithuUsersRequest'
+          $ref: '#/definitions/presentation.GetAccountDetailsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+            $ref: '#/definitions/presentation.GetAccountDetailsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+            $ref: '#/definitions/presentation.GetAccountDetailsResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+            $ref: '#/definitions/presentation.GetAccountDetailsResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/presentation.GetGithubUsersResponse'
+            $ref: '#/definitions/presentation.GetAccountDetailsResponse'
       summary: Get details of all provided github users
       tags:
       - user

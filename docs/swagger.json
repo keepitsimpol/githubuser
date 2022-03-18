@@ -7,12 +7,12 @@
             "name": "Pol Torres",
             "email": "apolinario.torresjr@gmail.com"
         },
-        "version": "1.0"
+        "version": "1.0.0"
     },
     "host": "localhost:8080",
     "basePath": "/api/v1",
     "paths": {
-        "/users": {
+        "/users/github": {
             "post": {
                 "description": "Get details of all provided github users",
                 "consumes": [
@@ -32,7 +32,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithuUsersRequest"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsRequest"
                         }
                     }
                 ],
@@ -40,25 +40,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/presentation.GetGithubUsersResponse"
+                            "$ref": "#/definitions/presentation.GetAccountDetailsResponse"
                         }
                     }
                 }
@@ -66,7 +66,7 @@
         }
     },
     "definitions": {
-        "presentation.GetGithuUsersRequest": {
+        "presentation.GetAccountDetailsRequest": {
             "type": "object",
             "properties": {
                 "users": {
@@ -77,7 +77,7 @@
                 }
             }
         },
-        "presentation.GetGithubUsersResponse": {
+        "presentation.GetAccountDetailsResponse": {
             "type": "object",
             "properties": {
                 "message": {
@@ -85,6 +85,10 @@
                 },
                 "result": {
                     "type": "boolean"
+                },
+                "userDetails": {
+                    "type": "array",
+                    "items": {}
                 }
             }
         }
