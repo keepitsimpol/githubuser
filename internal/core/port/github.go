@@ -7,7 +7,7 @@ type GithubClient interface {
 }
 
 type GetGithubUserResponse struct {
-	ID          string `json:"id"`
+	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Login       string `json:"login"`
 	Company     string `json:"company"`

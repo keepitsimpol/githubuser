@@ -14,8 +14,22 @@ definitions:
       result:
         type: boolean
       userDetails:
-        items: {}
+        items:
+          $ref: '#/definitions/presentation.UserDetails'
         type: array
+    type: object
+  presentation.UserDetails:
+    properties:
+      company:
+        type: string
+      followers:
+        type: integer
+      login:
+        type: string
+      name:
+        type: string
+      publicRepos:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -26,7 +40,7 @@ info:
   title: GithubUser APIs
   version: 1.0.0
 paths:
-  /users/github:
+  /users/{source}:
     post:
       consumes:
       - application/json
@@ -38,6 +52,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/presentation.GetAccountDetailsRequest'
+      - description: Account source
+        in: path
+        name: source
+        required: true
+        type: string
       produces:
       - application/json
       responses:

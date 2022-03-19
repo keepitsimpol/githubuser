@@ -63,7 +63,7 @@ func TestGetAccountDetails(t *testing.T) {
 				GetGithubUserHasError(tc.hasClientError).
 				Build()
 
-			service := New(mockGithubClient)
+			service := NewAccountService(mockGithubClient)
 			response, errorType, err := service.GetAccountDetails(model.GetAccountDetailRequest{UserNames: tc.usernames},
 				context.Background())
 

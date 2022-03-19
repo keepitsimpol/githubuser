@@ -19,7 +19,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users/github": {
+        "/users/{source}": {
             "post": {
                 "description": "Get details of all provided github users",
                 "consumes": [
@@ -41,6 +41,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/presentation.GetAccountDetailsRequest"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account source",
+                        "name": "source",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -95,7 +102,29 @@ const docTemplate = `{
                 },
                 "userDetails": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "$ref": "#/definitions/presentation.UserDetails"
+                    }
+                }
+            }
+        },
+        "presentation.UserDetails": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "followers": {
+                    "type": "integer"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "publicRepos": {
+                    "type": "integer"
                 }
             }
         }

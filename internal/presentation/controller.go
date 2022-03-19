@@ -12,13 +12,13 @@ import (
 )
 
 type accountDetailController struct {
-	service port.AccountDetailService
+	serviceFactory port.AccountDetailFactory
 }
 
-func New(service port.AccountDetailService) *accountDetailController {
-	controller := new(accountDetailController)
-	controller.service = service
-	return controller
+func New(serviceFactory port.AccountDetailFactory) *accountDetailController {
+	service := new(accountDetailController)
+	service.serviceFactory = serviceFactory
+	return service
 }
 
 type GetAccountDetailsRequest struct {
@@ -32,11 +32,11 @@ type GetAccountDetailsResponse struct {
 }
 
 type UserDetails struct {
-	Name        string `json:"name"`
-	Login       string `json:"login"`
-	Company     string `json:"company"`
+	Name        string `json:"name,omitempty"`
+	Login       string `json:"login,omitempty"`
+	Company     string `json:"company,omitempty"`
 	Followers   int    `json:"followers"`
-	PublicRepos int    `json:"publicRepos"`
+	PublicRepos int    `json:"publicRepos,omitempty"`
 }
 
 // GetUserAccountDetails godoc
@@ -46,11 +46,12 @@ type UserDetails struct {
 // @Accept       json
 // @Produce      json
 // @Param        account  body      GetAccountDetailsRequest  true  "List of users"
+// @Param        source   path      string                    true  "Account source"
 // @Success      200      {object}  GetAccountDetailsResponse
 // @Failure      400      {object}  GetAccountDetailsResponse
 // @Failure      404      {object}  GetAccountDetailsResponse
 // @Failure      500      {object}  GetAccountDetailsResponse
-// @Router       /users/github [post]
+// @Router       /users/{source} [post]
 func (c accountDetailController) GetUserAccountDetails(ctx *gin.Context) {
 	util.Infoln(ctx, "Start Getting all users account details")
 
@@ -62,7 +63,14 @@ func (c accountDetailController) GetUserAccountDetails(ctx *gin.Context) {
 		return
 	}
 
-	response, errorType, err := c.service.GetAccountDetails(model.GetAccountDetailRequest{UserNames: request.Users}, ctx)
+	service, err := c.serviceFactory.GetAccountDetailService(ctx.Param("source"))
+	if err != nil {
+		util.Errorf(ctx, "Error in getting service: %s", err.Error())
+		ctx.JSON(http.StatusNotFound, GetAccountDetailsResponse{Message: "Source not found."})
+		return
+	}
+
+	response, errorType, err := service.GetAccountDetails(model.GetAccountDetailRequest{UserNames: request.Users}, ctx)
 	httpCode := c.convertAppErrorCodeToHttpCode(errorType, ctx)
 	if err != nil {
 		ctx.JSON(httpCode, GetAccountDetailsResponse{Message: err.Error()})

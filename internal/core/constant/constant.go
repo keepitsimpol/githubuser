@@ -1,6 +1,6 @@
 package constant
 
 const (
-	Logger    = "logger"
-	RequestID = "x-request-id"
+	RequestID    = "x-request-id"
+	SourceGithub = "github"
 )

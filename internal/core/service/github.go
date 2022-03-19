@@ -16,7 +16,7 @@ type githubAccountDetailService struct {
 	githubClient port.GithubClient
 }
 
-func New(githubClient port.GithubClient) *githubAccountDetailService {
+func NewAccountService(githubClient port.GithubClient) *githubAccountDetailService {
 	service := new(githubAccountDetailService)
 	service.githubClient = githubClient
 	return service

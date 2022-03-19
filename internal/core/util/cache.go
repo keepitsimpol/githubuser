@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dgraph-io/ristretto"
+	"github.com/sirupsen/logrus"
 )
 
 var gloabalCache *ristretto.Cache
@@ -43,6 +44,7 @@ func AddtoCache(key string, value interface{}) {
 func ExpireCache(key string) {
 	go func() {
 		time.Sleep(CacheExpiration)
+		logrus.Infof("Expiring entry: %s", key)
 		gloabalCache.Del(key)
 	}()
 }

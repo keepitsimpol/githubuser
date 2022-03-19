@@ -20,6 +20,7 @@ func TestGetUserAccountDetails(t *testing.T) {
 		testcase                  string
 		usernames                 []string
 		expectedFirstName         string
+		url                       string
 		result                    bool
 		message                   string
 		httpCode                  int
@@ -29,6 +30,7 @@ func TestGetUserAccountDetails(t *testing.T) {
 	}{
 		{
 			testcase:          "Request with 10 usernames",
+			url:               "/test/github",
 			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
 			expectedFirstName: "aboy3",
 			result:            true,
@@ -36,6 +38,7 @@ func TestGetUserAccountDetails(t *testing.T) {
 		},
 		{
 			testcase:          "Request with 10 usernames - test cache",
+			url:               "/test/github",
 			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
 			expectedFirstName: "aboy3",
 			result:            true,
@@ -44,6 +47,7 @@ func TestGetUserAccountDetails(t *testing.T) {
 		},
 		{
 			testcase:          "Request with more than 10 usernames",
+			url:               "/test/github",
 			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10", "zboy"},
 			expectedFirstName: "aboy3",
 			message:           "request is invalid",
@@ -51,12 +55,14 @@ func TestGetUserAccountDetails(t *testing.T) {
 		},
 		{
 			testcase:  "Request is empty",
+			url:       "/test/github",
 			usernames: []string{},
 			message:   "request is invalid",
 			httpCode:  http.StatusBadRequest,
 		},
 		{
 			testcase:          "Has Github client error",
+			url:               "/test/github",
 			usernames:         []string{"boyHasClientError"},
 			expectedFirstName: "",
 			hasClientError:    true,
@@ -65,9 +71,17 @@ func TestGetUserAccountDetails(t *testing.T) {
 		},
 		{
 			testcase:                  "Should error parsing request",
+			url:                       "/test/github",
 			shouldErrorParsingRequest: true,
 			message:                   "Failed to parse request.",
 			httpCode:                  http.StatusBadRequest,
+		},
+		{
+			testcase:  "Source is not github",
+			url:       "/test/bitbucket",
+			usernames: []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
+			message:   "Source not found.",
+			httpCode:  http.StatusNotFound,
 		},
 	}
 
@@ -78,11 +92,11 @@ func TestGetUserAccountDetails(t *testing.T) {
 				GetGithubUserHasError(tc.hasClientError).
 				Build()
 
-			serviceImpl := service.New(mockGithubClient)
-			controller := New(serviceImpl)
+			factory := service.NewAccountDetailServiceFactory(mockGithubClient)
+			controller := New(factory)
 
 			router := gin.Default()
-			router.POST("/test", controller.GetUserAccountDetails)
+			router.POST("/test/:source", controller.GetUserAccountDetails)
 
 			var reqBytes []byte
 			if !tc.shouldErrorParsingRequest {
@@ -92,7 +106,7 @@ func TestGetUserAccountDetails(t *testing.T) {
 				reqBytes = r
 			}
 
-			req, err := http.NewRequest("POST", "/test", bytes.NewReader(reqBytes))
+			req, err := http.NewRequest("POST", tc.url, bytes.NewReader(reqBytes))
 			g.Expect(err).To(BeNil())
 
 			writer := httptest.NewRecorder()

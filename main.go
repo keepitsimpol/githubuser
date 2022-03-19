@@ -22,9 +22,9 @@ const GinMode = gin.ReleaseMode
 // @host           localhost:8080
 // @BasePath       /api/v1
 func main() {
-	githubClientImpl := infrastructure.New()
-	githubServiceImpl := service.New(githubClientImpl)
-	githubUserController := presentation.New(githubServiceImpl)
+	githubClient := infrastructure.New()
+	accountServiceFactory := service.NewAccountDetailServiceFactory(githubClient)
+	githubUserController := presentation.New(accountServiceFactory)
 
 	router := gin.Default()
 	gin.SetMode(GinMode)
@@ -33,10 +33,7 @@ func main() {
 
 	v1 := router.Group("/api/v1")
 	{
-		users := v1.Group("users")
-		{
-			users.POST("/github", githubUserController.GetUserAccountDetails)
-		}
+		v1.POST("/users/:source", githubUserController.GetUserAccountDetails)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
