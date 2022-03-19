@@ -82,10 +82,6 @@ func (c accountDetailController) convertAppErrorCodeToHttpCode(errorType errorco
 		return http.StatusOK
 	} else if errorType == errorcode.InvalidRequest {
 		return http.StatusBadRequest
-	} else if errorType == errorcode.InternalError {
-		return http.StatusInternalServerError
-	} else if errorType == errorcode.DependencyError {
-		return http.StatusFailedDependency
 	} else {
 		util.Errorf(ctx, "Unsupported error type: %d", errorType)
 		return http.StatusInternalServerError

@@ -7,7 +7,6 @@ import (
 	"github.com/keepitsimpol/githubuser/internal/core/constant/errorcode"
 	"github.com/keepitsimpol/githubuser/internal/core/mock"
 	"github.com/keepitsimpol/githubuser/internal/core/model"
-	"github.com/keepitsimpol/githubuser/internal/core/port"
 	"github.com/keepitsimpol/githubuser/internal/core/util"
 	. "github.com/onsi/gomega"
 )
@@ -15,42 +14,30 @@ import (
 func TestGetAccountDetails(t *testing.T) {
 	g := NewGomegaWithT(t)
 	scenarios := []struct {
-		testcase        string
-		usernames       []string
-		response        port.GetGithubUserResponse
-		shouldTestCache bool
-		hasError        bool
-		hasClientError  bool
-		errorType       errorcode.AppErrorCode
+		testcase          string
+		usernames         []string
+		expectedFirstName string
+		shouldTestCache   bool
+		hasError          bool
+		hasClientError    bool
+		errorType         errorcode.AppErrorCode
 	}{
 		{
-			testcase:  "Request with 10 usernames",
-			usernames: []string{"boy1", "boy2", "boy3", "boy4", "boy5", "boy6", "boy7", "boy8", "boy9", "boy10"},
-			response: port.GetGithubUserResponse{
-				Name:        "Boy 1",
-				Login:       "Boy 1",
-				Company:     "ABC",
-				Followers:   0,
-				PublicRepos: 0,
-			},
-			errorType: errorcode.NoError,
+			testcase:          "Request with 10 usernames",
+			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
+			expectedFirstName: "aboy3",
+			errorType:         errorcode.NoError,
 		},
 		{
-			testcase:        "Request with 10 usernames - test cache",
-			usernames:       []string{"boy1", "boy2", "boy3", "boy4", "boy5", "boy6", "boy7", "boy8", "boy9", "boy10"},
-			shouldTestCache: true,
-			response: port.GetGithubUserResponse{
-				Name:        "Boy 1",
-				Login:       "Boy 1",
-				Company:     "ABC",
-				Followers:   0,
-				PublicRepos: 0,
-			},
-			errorType: errorcode.NoError,
+			testcase:          "Request with 10 usernames - test cache",
+			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
+			shouldTestCache:   true,
+			expectedFirstName: "aboy3",
+			errorType:         errorcode.NoError,
 		},
 		{
 			testcase:  "Request with more than 10 usernames",
-			usernames: []string{"boy1", "boy2", "boy3", "boy4", "boy5", "boy6", "boy7", "boy8", "boy9", "boy10", "boy11"},
+			usernames: []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10", "zboy"},
 			hasError:  true,
 			errorType: errorcode.InvalidRequest,
 		},
@@ -73,7 +60,6 @@ func TestGetAccountDetails(t *testing.T) {
 		t.Run(tc.testcase, func(t *testing.T) {
 			util.GetCache().Clear()
 			mockGithubClient := mock.Builder().
-				MockGetGithubUserResponse(tc.response).
 				GetGithubUserHasError(tc.hasClientError).
 				Build()
 
@@ -93,11 +79,7 @@ func TestGetAccountDetails(t *testing.T) {
 
 				if !tc.hasClientError {
 					sampleResponse := response[0]
-					g.Expect(sampleResponse.Name).To(Equal(tc.response.Name))
-					g.Expect(sampleResponse.Login).To(Equal(tc.response.Login))
-					g.Expect(sampleResponse.Company).To(Equal(tc.response.Company))
-					g.Expect(sampleResponse.Followers).To(Equal(tc.response.Followers))
-					g.Expect(sampleResponse.PublicRepos).To(Equal(tc.response.PublicRepos))
+					g.Expect(sampleResponse.Name).To(Equal(tc.expectedFirstName))
 				}
 			}
 			g.Expect(errorType).To(Equal(tc.errorType))

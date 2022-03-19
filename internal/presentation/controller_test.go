@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/keepitsimpol/githubuser/internal/core/mock"
-	"github.com/keepitsimpol/githubuser/internal/core/port"
 	"github.com/keepitsimpol/githubuser/internal/core/service"
 	"github.com/keepitsimpol/githubuser/internal/core/util"
 	. "github.com/onsi/gomega"
@@ -18,67 +17,64 @@ import (
 func TestGetUserAccountDetails(t *testing.T) {
 	g := NewGomegaWithT(t)
 	scenarios := []struct {
-		testcase        string
-		usernames       []string
-		response        port.GetGithubUserResponse
-		result          bool
-		message         string
-		httpCode        int
-		shouldTestCache bool
-		hasClientError  bool
+		testcase                  string
+		usernames                 []string
+		expectedFirstName         string
+		result                    bool
+		message                   string
+		httpCode                  int
+		shouldTestCache           bool
+		hasClientError            bool
+		shouldErrorParsingRequest bool
 	}{
 		{
-			testcase:  "Request with 10 usernames",
-			usernames: []string{"boy1", "boy2", "boy3", "boy4", "boy5", "boy6", "boy7", "boy8", "boy9", "boy10"},
-			result:    true,
-			httpCode:  http.StatusOK,
-			response: port.GetGithubUserResponse{
-				Name:        "Boy 1",
-				Login:       "Boy 1",
-				Company:     "ABC",
-				Followers:   0,
-				PublicRepos: 0,
-			},
+			testcase:          "Request with 10 usernames",
+			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
+			expectedFirstName: "aboy3",
+			result:            true,
+			httpCode:          http.StatusOK,
 		},
-		// {
-		// 	testcase:        "Request with 10 usernames - test cache",
-		// 	usernames:       []string{"boy1", "boy2", "boy3", "boy4", "boy5", "boy6", "boy7", "boy8", "boy9", "boy10"},
-		// 	shouldTestCache: true,
-		// 	response: port.GetGithubUserResponse{
-		// 		Name:        "Boy 1",
-		// 		Login:       "Boy 1",
-		// 		Company:     "ABC",
-		// 		Followers:   0,
-		// 		PublicRepos: 0,
-		// 	},
-		// 	errorType: errorcode.NoError,
-		// },
-		// {
-		// 	testcase:  "Request with more than 10 usernames",
-		// 	usernames: []string{"boy1", "boy2", "boy3", "boy4", "boy5", "boy6", "boy7", "boy8", "boy9", "boy10", "boy11"},
-		// 	hasError:  true,
-		// 	errorType: errorcode.InvalidRequest,
-		// },
-		// {
-		// 	testcase:  "Request is empty",
-		// 	usernames: []string{},
-		// 	hasError:  true,
-		// 	errorType: errorcode.InvalidRequest,
-		// },
-		// {
-		// 	testcase:       "Has Github client error",
-		// 	usernames:      []string{"boy1"},
-		// 	hasError:       false,
-		// 	hasClientError: true,
-		// 	errorType:      errorcode.NoError,
-		// },
+		{
+			testcase:          "Request with 10 usernames - test cache",
+			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10"},
+			expectedFirstName: "aboy3",
+			result:            true,
+			shouldTestCache:   true,
+			httpCode:          http.StatusOK,
+		},
+		{
+			testcase:          "Request with more than 10 usernames",
+			usernames:         []string{"nboy1", "bboy2", "aboy3", "aboy4", "eboy5", "fboy6", "gboy7", "hboy8", "iboy9", "jboy10", "zboy"},
+			expectedFirstName: "aboy3",
+			message:           "request is invalid",
+			httpCode:          http.StatusBadRequest,
+		},
+		{
+			testcase:  "Request is empty",
+			usernames: []string{},
+			message:   "request is invalid",
+			httpCode:  http.StatusBadRequest,
+		},
+		{
+			testcase:          "Has Github client error",
+			usernames:         []string{"boyHasClientError"},
+			expectedFirstName: "",
+			hasClientError:    true,
+			result:            true,
+			httpCode:          http.StatusOK,
+		},
+		{
+			testcase:                  "Should error parsing request",
+			shouldErrorParsingRequest: true,
+			message:                   "Failed to parse request.",
+			httpCode:                  http.StatusBadRequest,
+		},
 	}
 
 	for _, tc := range scenarios {
 		t.Run(tc.testcase, func(t *testing.T) {
 			util.GetCache().Clear()
 			mockGithubClient := mock.Builder().
-				MockGetGithubUserResponse(tc.response).
 				GetGithubUserHasError(tc.hasClientError).
 				Build()
 
@@ -88,8 +84,14 @@ func TestGetUserAccountDetails(t *testing.T) {
 			router := gin.Default()
 			router.POST("/test", controller.GetUserAccountDetails)
 
-			request := GetAccountDetailsRequest{Users: tc.usernames}
-			reqBytes, err := json.Marshal(request)
+			var reqBytes []byte
+			if !tc.shouldErrorParsingRequest {
+				req := GetAccountDetailsRequest{Users: tc.usernames}
+				r, err := json.Marshal(req)
+				g.Expect(err).To(BeNil())
+				reqBytes = r
+			}
+
 			req, err := http.NewRequest("POST", "/test", bytes.NewReader(reqBytes))
 			g.Expect(err).To(BeNil())
 
@@ -112,13 +114,9 @@ func TestGetUserAccountDetails(t *testing.T) {
 			g.Expect(response.Message).To(Equal(tc.message))
 			g.Expect(writer.Code).To(Equal(tc.httpCode))
 
-			if tc.result {
+			if tc.result && !tc.hasClientError {
 				sampleResponse := response.UserDetails[0]
-				g.Expect(sampleResponse.Name).To(Equal(tc.response.Name))
-				g.Expect(sampleResponse.Login).To(Equal(tc.response.Login))
-				g.Expect(sampleResponse.Company).To(Equal(tc.response.Company))
-				g.Expect(sampleResponse.Followers).To(Equal(tc.response.Followers))
-				g.Expect(sampleResponse.PublicRepos).To(Equal(tc.response.PublicRepos))
+				g.Expect(sampleResponse.Name).To(Equal(tc.expectedFirstName))
 			}
 		})
 	}

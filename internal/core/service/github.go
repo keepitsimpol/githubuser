@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"sort"
 
 	validate "github.com/go-playground/validator/v10"
 	"github.com/keepitsimpol/githubuser/internal/core/constant/errorcode"
@@ -31,6 +32,10 @@ func (s githubAccountDetailService) GetAccountDetails(users model.GetAccountDeta
 		return response, errorcode.InvalidRequest, errors.New("request is invalid")
 	}
 
+	sort.SliceStable(users.UserNames, func(i, j int) bool {
+		return users.UserNames[i] < users.UserNames[j]
+	})
+
 	for _, user := range users.UserNames {
 		if cachedUser, ok := util.GetCache().Get(user); ok {
 			util.Infof(ctx, "User: %s is already cached. Reusing cached entry.", user)
@@ -45,14 +50,15 @@ func (s githubAccountDetailService) GetAccountDetails(users model.GetAccountDeta
 		}
 
 		util.Infof(ctx, "Adding account details for user: %s", user)
-		response = append(response, model.GetAccountDetailResponse{
+		accountDetail := model.GetAccountDetailResponse{
 			Name:        githubClientResponse.Name,
 			Login:       githubClientResponse.Login,
 			Company:     githubClientResponse.Company,
 			Followers:   githubClientResponse.Followers,
 			PublicRepos: githubClientResponse.PublicRepos,
-		})
-		util.AddtoCache(user, githubClientResponse)
+		}
+		response = append(response, accountDetail)
+		util.AddtoCache(user, accountDetail)
 	}
 
 	util.Infof(ctx, "End getting github users service with response: %+v", response)

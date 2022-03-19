@@ -8,15 +8,19 @@ import (
 )
 
 type githubClientMock struct {
-	GetGithubUserResponse port.GetGithubUserResponse
+	GetGithubUserResponse *port.GetGithubUserResponse
 	hasError              bool
 }
 
-func (c *githubClientMock) GetGithubUser(_ string, _ context.Context) (clientResponse port.GetGithubUserResponse, err error) {
+func (c *githubClientMock) GetGithubUser(username string, _ context.Context) (clientResponse port.GetGithubUserResponse, err error) {
 	if c.hasError {
 		return port.GetGithubUserResponse{}, errors.New("mock GetGithubUser error")
 	}
-	return c.GetGithubUserResponse, nil
+
+	if c.GetGithubUserResponse == nil {
+		return port.GetGithubUserResponse{Name: username}, nil
+	}
+	return *c.GetGithubUserResponse, nil
 }
 
 // Builder
@@ -32,7 +36,7 @@ func Builder() *githubMockBuilder {
 }
 
 func (b *githubMockBuilder) MockGetGithubUserResponse(mockResponse port.GetGithubUserResponse) *githubMockBuilder {
-	b.clientMock.GetGithubUserResponse = mockResponse
+	b.clientMock.GetGithubUserResponse = &mockResponse
 	return b
 }
 
