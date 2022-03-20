@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "A service that provides Github user details",
-        "title": "GithubUser APIs",
+        "description": "A service that provides user account details",
+        "title": "Account Detail APIs",
         "contact": {
             "name": "Pol Torres",
             "email": "apolinario.torresjr@gmail.com"

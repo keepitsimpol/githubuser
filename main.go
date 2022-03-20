@@ -14,9 +14,9 @@ import (
 
 const GinMode = gin.ReleaseMode
 
-// @title          GithubUser APIs
+// @title          Account Detail APIs
 // @version        1.0.0
-// @description    A service that provides Github user details
+// @description    A service that provides user account details
 // @contact.name   Pol Torres
 // @contact.email  apolinario.torresjr@gmail.com
 // @host           localhost:8080

@@ -36,7 +36,7 @@ type UserDetails struct {
 	Login       string `json:"login,omitempty"`
 	Company     string `json:"company,omitempty"`
 	Followers   int    `json:"followers"`
-	PublicRepos int    `json:"publicRepos,omitempty"`
+	PublicRepos int    `json:"publicRepos"`
 }
 
 // GetUserAccountDetails godoc
@@ -81,7 +81,7 @@ func (c accountDetailController) GetUserAccountDetails(ctx *gin.Context) {
 		Result:      true,
 		UserDetails: c.convertToUserDetails(response),
 	})
-	util.Infoln(ctx, "End Getting all github users detail")
+	util.Infoln(ctx, "End Getting all users account details")
 }
 
 func (c accountDetailController) convertAppErrorCodeToHttpCode(errorType errorcode.AppErrorCode, ctx context.Context) int {

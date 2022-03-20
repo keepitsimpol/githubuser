@@ -54,4 +54,4 @@ To run unit tests with coverage:
 Proposed future features:
 - Additional request validation like access token
 - Using of go flags for dynamic service configuration
-- graceful shutdown
+- Graceful shutdown

@@ -137,8 +137,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "GithubUser APIs",
-	Description:      "A service that provides Github user details",
+	Title:            "Account Detail APIs",
+	Description:      "A service that provides user account details",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
