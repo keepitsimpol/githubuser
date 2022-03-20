@@ -1,10 +1,10 @@
 # Background
 Requirement:
-- This service will accept a list of usernames in a specific website.
-- This will also not terminate the request even if one of those requested username has an error.
+- This service will accept a list of usernames in Github.
+- Request should not be terminated even if one of those requested username has an error or not found.
 - A maximum of 10 usernames can be searched by this service per request
 - Usernames should be sorted alphabetically on the response
-- Fetched user account details should be cached and invalidate after 2mins
+- Fetched user account details should be cached and invalidated after 2mins
 
 Solution:
 - REST webservice (Accepts: JSON Produces: JSON)
